@@ -17,7 +17,7 @@ def main():
     # MAN PROGRAM LOOP
     print("The Width is: " + str(screen.get_width()))
     print("The Height is: " + str(screen.get_height()))
-    maze = Maze(20,20)
+    maze = Maze(30,30)
     maze.make_maze()
     maze.render(screen, 456)
     while gameLoop:

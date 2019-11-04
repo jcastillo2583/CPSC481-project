@@ -82,16 +82,16 @@ class Maze:
         for y in range(self.ny):
             for x in range(self.nx):
                 if(self.maze_map[x][y].walls['N']):
-                    pygame.draw.rect(surface, (255,0,0), (x_pos, y_pos, rect_length ,rect_width))
+                    pygame.draw.rect(surface, (255,255,255), (x_pos, y_pos, rect_length ,rect_width))
                     pygame.display.update()
                 if(self.maze_map[x][y].walls['E']):
-                    pygame.draw.rect(surface, (0,255,0), (x_pos+rect_length-rect_width, y_pos, rect_width,rect_length))
+                    pygame.draw.rect(surface, (255,255,255), (x_pos+rect_length-rect_width, y_pos, rect_width,rect_length))
                     pygame.display.update()
                 if(self.maze_map[x][y].walls['S']):
-                    pygame.draw.rect(surface, (255,0,255), (x_pos, y_pos+rect_length-rect_width, rect_length,rect_width))
+                    pygame.draw.rect(surface, (255,255,255), (x_pos, y_pos+rect_length-rect_width, rect_length,rect_width))
                     pygame.display.update()
                 if(self.maze_map[x][y].walls['W']):
-                    pygame.draw.rect(surface, (255,255,0), (x_pos, y_pos, rect_width,rect_length))
+                    pygame.draw.rect(surface, (255,255,255), (x_pos, y_pos, rect_width,rect_length))
                     pygame.display.update()
                 x_pos = x_pos + rect_length- rect_width
             ###Move the y coordinate y +length
