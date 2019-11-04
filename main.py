@@ -1,24 +1,25 @@
 import pygame
 from maze import Maze, Cell
 def main():
-
     pygame.init()
     # COLORS
     black = (0, 0, 0)
     white = (255, 255, 255)
 
     # WINDOW
-    windowSize = (800, 500)
-    screen = pygame.display.set_mode(windowSize)
+    screen = pygame.display.set_mode((0,0))
+    screen = pygame.display.set_mode((screen.get_width()-200,screen.get_height()-200))
     pygame.display.set_caption("Minotaur Maze")
 
     #GAME LOOP: Plays game until user exit
     gameLoop = True
 
     # MAN PROGRAM LOOP
-    maze = Maze(10,10)
+    print("The Width is: " + str(screen.get_width()))
+    print("The Height is: " + str(screen.get_height()))
+    maze = Maze(20,20)
     maze.make_maze()
-    maze.render(screen,800,500,10)
+    maze.render(screen, 456)
     while gameLoop:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:

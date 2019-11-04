@@ -73,29 +73,30 @@ class Maze:
             maze_rows.append(''.join(maze_row))
         return '\n'.join(maze_rows)
 
-    def render(self,surface,length, width, padding=20):
-        rect_length = (min(length,width)-padding*2)/self.nx
-        x_pos = padding
-        y_pos = padding
+    def render(self,surface, hori_padd=456, ver_padd=10):
+        rect_length = (surface.get_width()-hori_padd*2)/self.nx
+        rect_width = abs((rect_length*self.ny-surface.get_height()-ver_padd*2)/(self.ny-1))
+        print("Calculated width is: " + str(rect_width))
+        x_pos = hori_padd
+        y_pos = ver_padd
         for y in range(self.ny):
             for x in range(self.nx):
                 if(self.maze_map[x][y].walls['N']):
-                    pygame.draw.rect(surface, (255,0,0), (x_pos, y_pos, rect_length ,5))
+                    pygame.draw.rect(surface, (255,0,0), (x_pos, y_pos, rect_length ,rect_width))
                     pygame.display.update()
                 if(self.maze_map[x][y].walls['E']):
-                    pygame.draw.rect(surface, (0,255,0), (x_pos+rect_length, y_pos, 5,rect_length))
+                    pygame.draw.rect(surface, (0,255,0), (x_pos+rect_length-rect_width, y_pos, rect_width,rect_length))
                     pygame.display.update()
                 if(self.maze_map[x][y].walls['S']):
-                    pygame.draw.rect(surface, (255,0,255), (x_pos, y_pos+rect_length, rect_length,5))
+                    pygame.draw.rect(surface, (255,0,255), (x_pos, y_pos+rect_length-rect_width, rect_length,rect_width))
                     pygame.display.update()
                 if(self.maze_map[x][y].walls['W']):
-                    pygame.draw.rect(surface, (255,255,0), (x_pos, y_pos, 5,rect_length))
+                    pygame.draw.rect(surface, (255,255,0), (x_pos, y_pos, rect_width,rect_length))
                     pygame.display.update()
-                pygame.time.delay(100)
-                x_pos = x_pos + rect_length
+                x_pos = x_pos + rect_length- rect_width
             ###Move the y coordinate y +length
-            y_pos = y_pos + rect_length
-            x_pos = padding
+            y_pos = y_pos + rect_length - rect_width
+            x_pos = hori_padd
 
             #End Inner For
         #End Outer For
@@ -114,6 +115,32 @@ class Maze:
                 if neighbour.has_all_walls():
                     neighbours.append((direction, neighbour))
         return neighbours
+
+    def make_maze_step(self, surface ):
+        # Total number of cells.
+        n = self.nx * self.ny
+        cell_stack = []
+        current_cell = self.cell_at(self.ix, self.iy)
+        # Total number of visited cells during maze construction.
+        nv = 1
+
+        while nv < n:
+            self.render(surface)
+            pygame.time.delay(1000)
+            surface.fill((0,0,0))
+            neighbours = self.find_valid_neighbours(current_cell)
+            if not neighbours:
+                # We've reached a dead end: backtrack.
+                current_cell = cell_stack.pop()
+                continue
+            # Choose a random neighbouring cell and move to it.
+            direction, next_cell = random.choice(neighbours)
+            current_cell.knock_down_wall(next_cell, direction)
+            cell_stack.append(current_cell)
+            current_cell = next_cell
+            nv += 1
+
+
 
     def make_maze(self):
         # Total number of cells.
