@@ -17,9 +17,9 @@ def main():
     # MAN PROGRAM LOOP
     print("The Width is: " + str(screen.get_width()))
     print("The Height is: " + str(screen.get_height()))
-    maze = Maze(30,30)
+    maze = Maze(screen, 30,30)
     maze.make_maze()
-    maze.render(screen, 456)
+    maze.render()
     while gameLoop:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
