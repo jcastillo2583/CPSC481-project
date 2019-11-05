@@ -1,4 +1,5 @@
 import pygame
+from Minotaur import Minotaur
 from maze import Maze, Cell
 def main():
     pygame.init()
@@ -8,7 +9,7 @@ def main():
 
     # WINDOW
     screen = pygame.display.set_mode((0,0))
-    screen = pygame.display.set_mode((screen.get_width()-200,screen.get_height()-200))
+    screen = pygame.display.set_mode((screen.get_width()-160,screen.get_height()-160))
     pygame.display.set_caption("Minotaur Maze")
 
     #GAME LOOP: Plays game until user exit
@@ -17,8 +18,18 @@ def main():
     # MAN PROGRAM LOOP
     print("The Width is: " + str(screen.get_width()))
     print("The Height is: " + str(screen.get_height()))
-    maze = Maze(screen, 30,30)
+    maze = Maze(screen, 10,10)
     maze.make_maze()
+    maze.render()
+    mino = Minotaur(screen,maze,0,0)
+    mino.render()
+
+    ###CHANGE THIS TO CHANG THE GOALS
+            #BEGIN              #END
+    mino.bfs({'x':0 , 'y':0}, {'x':1 , 'y':2})
+    #structs = maze.generate_structures()
+    #maze.connect_strucutres(structs)
+
     maze.render()
     while gameLoop:
         for event in pygame.event.get():

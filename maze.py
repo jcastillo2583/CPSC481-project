@@ -1,4 +1,5 @@
 import pygame
+import math
 import random
 
 # Create a maze using the depth-first algorithm described at
@@ -47,8 +48,10 @@ class Maze:
         self.maze_map = [[Cell(x, y) for y in range(ny)] for x in range(nx)]
         self.hori_padd = hori_padd
         self.ver_padd = ver_padd
-        self.rect_length = (surface.get_width()-hori_padd*2)/self.nx
+        self.rect_length = abs((surface.get_width()-hori_padd*2)/self.nx)
         self.rect_width = abs((self.rect_length*self.ny-surface.get_height()-ver_padd*2)/(self.ny-1))
+        print(self.rect_length)
+        print(self.rect_width)
         self.surface = surface
 
     def cell_at(self, x, y):
@@ -86,23 +89,82 @@ class Maze:
             for x in range(self.nx):
                 if(self.maze_map[x][y].walls['N']):
                     pygame.draw.rect(self.surface, (255,255,255), (x_pos, y_pos, rect_length ,rect_width))
-                    pygame.display.update()
                 if(self.maze_map[x][y].walls['E']):
                     pygame.draw.rect(self.surface, (255,255,255), (x_pos+rect_length-rect_width, y_pos, rect_width,rect_length))
-                    pygame.display.update()
                 if(self.maze_map[x][y].walls['S']):
                     pygame.draw.rect(self.surface, (255,255,255), (x_pos, y_pos+rect_length-rect_width, rect_length,rect_width))
-                    pygame.display.update()
                 if(self.maze_map[x][y].walls['W']):
                     pygame.draw.rect(self.surface, (255,255,255), (x_pos, y_pos, rect_width,rect_length))
-                    pygame.display.update()
                 x_pos = x_pos + rect_length- rect_width
             ###Move the y coordinate y +length
             y_pos = y_pos + rect_length - rect_width
             x_pos = self.hori_padd
-
+            pygame.display.update()
             #End Inner For
         #End Outer For
+
+    def generate_structure(self, x, y):
+        #Top Left
+        self.maze_map[x-1][y-1].walls['N'] = True
+        self.maze_map[x-1][y-1].walls['E'] = False
+        self.maze_map[x-1][y-1].walls['S'] = False
+        self.maze_map[x-1][y-1].walls['W'] = True
+        #Top center
+        self.maze_map[x][y-1].walls['N'] = True
+        self.maze_map[x][y-1].walls['E'] = False
+        self.maze_map[x][y-1].walls['S'] = False
+        self.maze_map[x][y-1].walls['W'] = False
+        #Top Right
+        self.maze_map[x+1][y-1].walls['N'] = True
+        self.maze_map[x+1][y-1].walls['E'] = True
+        self.maze_map[x+1][y-1].walls['S'] = False
+        self.maze_map[x+1][y-1].walls['W'] = False
+        #Center Left
+        self.maze_map[x-1][y].walls['N'] = False
+        self.maze_map[x-1][y].walls['E'] = False
+        self.maze_map[x-1][y].walls['S'] = False
+        self.maze_map[x-1][y].walls['W'] = True
+        #center
+        self.maze_map[x][y].walls['N'] = False
+        self.maze_map[x][y].walls['E'] = False
+        self.maze_map[x][y].walls['S'] = False
+        self.maze_map[x][y].walls['W'] = False
+        #Center Right
+        self.maze_map[x+1][y].walls['N'] = False
+        self.maze_map[x+1][y].walls['E'] = True
+        self.maze_map[x+1][y].walls['S'] = False
+        self.maze_map[x+1][y].walls['W'] = False
+
+        #Bottom Left
+        self.maze_map[x-1][y+1].walls['N'] = False
+        self.maze_map[x-1][y+1].walls['E'] = False
+        self.maze_map[x-1][y+1].walls['S'] = True
+        self.maze_map[x-1][y+1].walls['W'] = True
+        #center
+        self.maze_map[x][y+1].walls['N'] = False
+        self.maze_map[x][y+1].walls['E'] = False
+        self.maze_map[x][y+1].walls['S'] = True
+        self.maze_map[x][y+1].walls['W'] = False
+        #Center Right
+        self.maze_map[x+1][y+1].walls['N'] = False
+        self.maze_map[x+1][y+1].walls['E'] = True
+        self.maze_map[x+1][y+1].walls['S'] = True
+        self.maze_map[x+1][y+1].walls['W'] = False
+
+    def generate_structures(self):
+        num_of_structures = math.ceil(max(self.nx,self.ny)/5)
+        x , y = random.randint(4,self.nx-4), random.randint(4,self.nx-4)
+        structures = [(x,y)]
+        self.generate_structure(x,y)
+        prev_x,prev_y = x , y
+        for structure in range(num_of_structures):
+            x , y = random.randint(4,self.nx-4), random.randint(4,self.nx-4)
+            while(math.sqrt((x-prev_x)**2+(y-prev_y)**2)<(max(self.nx,self.ny)/3)):
+                x , y = random.randint(4,self.nx-4), random.randint(4,self.nx-4)
+            self.generate_structure(x,y)
+            structures.append((x,y))
+            prev_x,prev_y = x , y
+        return structures
 
 
     def find_valid_neighbours(self, cell):
@@ -118,6 +180,12 @@ class Maze:
                 if neighbour.has_all_walls():
                     neighbours.append((direction, neighbour))
         return neighbours
+
+    def is_valid_cell(self, x, y):
+        if (x < self.nx and x >= 0 and y < self.ny and y>=0):
+            return True
+        else:
+            return False
 
     def make_maze_step(self, surface ):
         # Total number of cells.
