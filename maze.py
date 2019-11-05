@@ -211,6 +211,20 @@ class Maze:
             current_cell = next_cell
             nv += 1
 
+    def get_graph(self):
+        graph = {}
+        for x in range(self.nx):
+            for y in range(self.ny):
+                graph.update({(x,y) : []})
+                if( self.maze_map[x][y].walls['N']==False and self.is_valid_cell(x,y-1)):
+                    graph[(x,y)].append((x,y-1))
+                if( self.maze_map[x][y].walls['E']==False and self.is_valid_cell(x+1,y)):
+                    graph[(x,y)].append((x+1,y))
+                if( self.maze_map[x][y].walls['S']==False and self.is_valid_cell(x,y+1)):
+                    graph[(x,y)].append((x,y+1))
+                if( self.maze_map[x][y].walls['W']==False and self.is_valid_cell(x-1,y)):
+                    graph[(x,y)].append((x-1,y))
+        return graph
 
 
     def make_maze(self):
