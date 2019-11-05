@@ -20,20 +20,20 @@ class Minotaur:
         # l & w of rect = rec length - ( rect width * 2)
         """" If current is on ROW 0 --> rectangle vertical Padding = maze. ver_Padding + rect_Width  """
         if self.x == 0:
-            y_start = floor(self.maze.ver_padd + self.maze.rect_width)
+            y_start = ceil(self.maze.ver_padd + self.maze.rect_width)
         else:
-            y_start = floor(self.maze.ver_padd + self.y * self.maze.rect_length)
+            y_start = ceil(self.maze.ver_padd + self.y * self.maze.rect_length)
 
         """If current is on COL 0 --> rect horizontal padding = maze.hori_padding + rect_Width"""
         if self.y == 0:
-            x_start = floor(self.maze.hori_padd + self.maze.rect_width)
+            x_start = ceil(self.maze.hori_padd + self.maze.rect_width)
         else:
-            x_start = floor(self.maze.hori_padd + self.x * self.maze.rect_length)
+            x_start = ceil(self.maze.hori_padd + self.x * self.maze.rect_length)
 
         print("rendering the block at: ("+ str(x)+ ", "+str(y) + ")")
         print("x_start is: " + str(x_start))
         print("y_start is: " + str(y_start))
-        pygame.draw.rect(self.surface, (255, 0, 255), (ceil(x_start), ceil(y_start), abs(self.maze.rect_length-(self.maze.rect_width*2)-20), abs(self.maze.rect_length-(self.maze.rect_width*2)-20)))
+        pygame.draw.rect(self.surface, (255, 0, 255), ((x_start),(y_start), abs(self.maze.rect_length-(self.maze.rect_width*2)), abs(self.maze.rect_length-(self.maze.rect_width*2))))
         pygame.display.update()
 
 

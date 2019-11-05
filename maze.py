@@ -1,5 +1,5 @@
 import pygame
-import math
+from math import ceil
 import random
 
 # Create a maze using the depth-first algorithm described at
@@ -48,8 +48,8 @@ class Maze:
         self.maze_map = [[Cell(x, y) for y in range(ny)] for x in range(nx)]
         self.hori_padd = hori_padd
         self.ver_padd = ver_padd
-        self.rect_length = abs((surface.get_width()-hori_padd*2)/self.nx)
-        self.rect_width = abs((self.rect_length*self.ny-surface.get_height()-ver_padd*2)/(self.ny-1))
+        self.rect_length = abs(ceil((surface.get_width()-hori_padd*2)/self.nx))
+        self.rect_width = abs(ceil((self.rect_length*self.ny-surface.get_height()-ver_padd*2)/(self.ny-1)))
         print(self.rect_length)
         print(self.rect_width)
         self.surface = surface
