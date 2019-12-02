@@ -337,6 +337,8 @@ class Generator():
 
 
     def ai_walk(self, walk_interval,update_interval):
+        if(self.has_key):
+            walk_interval = walk_interval/2
         if(self.update_clock == -1):
             self.update_clock = dt.datetime.now()
             self.walk_clock = dt.datetime.now()
@@ -347,6 +349,9 @@ class Generator():
         if walk_interval < (dt.datetime.now() - self.walk_clock).total_seconds():
             for enemy in self.enemy_list:
                 enemy.walk()
+                if(enemy.path_progress>=len(enemy.target_path)):
+                    enemy.bfs((self.player.x,self.player.y),self.get_graph())
+                    enemy.walk_reset()
                 print("Walking")
             self.walk_clock = dt.datetime.now()
 

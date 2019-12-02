@@ -37,12 +37,12 @@ def main():
                 gameLoop = False
             if event.type == pygame.KEYDOWN:
                 dungeon.play_game()
-        dungeon.ai_walk(0.33,8)
+        dungeon.ai_walk(0.2,4)
         dungeon.render(screen,  0, 10)
         state = dungeon.check_state()
         if(state == "lose"):
             gameLoop = False
-            print("You completed Lost!")
+            print("You Lost!")
         elif(state == "win"):
             play_again = input("On to the next level? Y/n:")
             if(play_again == "Y"):
