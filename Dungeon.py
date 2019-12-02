@@ -1,9 +1,12 @@
 from __future__ import print_function
 import PIL
 from resizeimage import resizeimage
-from math import ceil
+from math import ceil , floor
 import pygame
 import random
+import datetime as dt
+from Minotaur import Minotaur
+from Player import Player
 
 CHARACTER_TILES = {'stone': ' ',
 
@@ -32,6 +35,15 @@ class Generator():
         self.room_list = []
         self.corridor_list = []
         self.tiles_level = []
+
+
+        self.update_clock = -1
+        self.walk_clock = -1
+        self.enemy_list = []
+        self.goal = (-1,-1)
+        self.key = (-1,-1)
+        self.has_key = False;
+        self.player = Player(self.level,0,0)
 
 
 
@@ -87,7 +99,9 @@ class Generator():
             elif join is 'bottom':
                 return [(x1, y1), (x2, y1), (x2, y2)]
 
-
+    def play_game(self):
+        direction = pygame.key.get_pressed()
+        self.player.move(direction)
 
     def join_rooms(self, room_1, room_2, join_type='either'):
         sorted_room = [room_1, room_2]
@@ -99,8 +113,6 @@ class Generator():
         h1 = sorted_room[0][3]
         x1_2 = x1 + w1 - 1
         y1_2 = y1 + h1 - 1
-
-
 
         x2 = sorted_room[1][0]
         y2 = sorted_room[1][1]
@@ -248,6 +260,40 @@ class Generator():
                         self.level[row + 1][col + 1] = 'wall'
 
 
+        r = random.randint(0, self.height- 1)
+        c = random.randint(0, self.width- 1)
+        while (self.level[r][c] != 'floor'):
+            r = random.randint(0, self.height - 1)
+            c = random.randint(0, self.width - 1)
+        self.goal = (r,c)
+        r = random.randint(0, self.height- 1)
+        c = random.randint(0, self.width- 1)
+        while (self.level[r][c] != 'floor' and (r,c) != self.goal):
+            r = random.randint(0, self.height - 1)
+            c = random.randint(0, self.width - 1)
+        self.key = (r,c)
+        r = random.randint(0, self.height- 1)
+        c = random.randint(0, self.width - 1)
+        while (self.level[r][c] != 'floor' and (r,c) != self.goal and (r,c) != self.key):
+            r = random.randint(0, self.height - 1)
+            c = random.randint(0, self.width - 1)
+        print(self.level[r][c])
+        (self.player.x, self.player.y) = (r, c)
+        self.player.dungeon = self.level
+
+
+
+
+    def gen_enemies(self, num = 1):
+        for i in range(0, num):
+            r = random.randint(0, self.height - 1)
+            c = random.randint(0, self.width - 1)
+            while (self.level[r][c] != 'floor'):
+                r = random.randint(0, self.height - 1)
+                c = random.randint(0, self.width - 1)
+            new_enemy = Minotaur(r,c)
+            self.enemy_list.append(new_enemy)
+
 
     def gen_tiles_level(self):
         for row_num, row in enumerate(self.level):
@@ -264,10 +310,63 @@ class Generator():
         print('\nCorridor List: ', self.corridor_list)
         [print(row) for row in self.tiles_level]
 
+    def get_graph(self):
+        graph = {}
+        for x in range(0,self.width-1):
+            for y in range(0,self.height-1):
+                graph.update({(x,y) : []})
+                if( self.is_valid_cell(x-1,y) and self.level[x-1][y]=='floor'):
+                    graph[(x,y)].append((x-1,y))
+                if(  self.is_valid_cell(x,y+1) and self.level[x][y+1]=='floor'):
+                    graph[(x,y)].append((x,y+1))
+                if( self.is_valid_cell(x+1,y)and  self.level[x+1][y] == 'floor'):
+                    graph[(x,y)].append((x+1,y))
+                if(self.is_valid_cell(x,y-1)and self.level[x][y-1] == 'floor'):
+                    graph[(x,y)].append((x,y-1))
+        return graph
+
+    def is_valid_cell(self,x,y):
+        if( x >= 0 and x < self.height and y >= 0 and y < self.width):
+            return True
+        else:
+            return False
+
+    def update_ai(self):
+        if(self.enemy_list):
+            for enemy in self.enemy_list:
+                enemy.bfs((self.player.x,self.player.y),self.get_graph())
+                enemy.walk_reset()
+        else:
+            print("There are no enemies generated yet.")
+
+    def ai_walk(self, walk_interval,update_interval):
+        if(self.update_clock == -1):
+            self.update_clock = dt.datetime.now()
+            self.walk_clock = dt.datetime.now()
+        if update_interval < (dt.datetime.now() - self.update_clock).total_seconds():
+            self.update_ai()
+            self.update_clock = dt.datetime.now()
+        if walk_interval < (dt.datetime.now() - self.walk_clock).total_seconds():
+            for enemy in self.enemy_list:
+                enemy.walk()
+                if(enemy.path_progress >= len(enemy.target_path)):
+                    self.update_ai()
+                print("Walking")
+            self.walk_clock = dt.datetime.now()
+
+
+
+    def check_state(self):
+        for enemy in self.enemy_list:
+            if (enemy.x,enemy.y) == (self.player.x,self.player.y):
+                return "lose"
+        if (self.player.x,self.player.y) == self.goal and self.has_key:
+            return "win"
+        if (self.player.x,self.player.y) == self.key:
+              self.has_key = True
+
     def render(self, surface, hori_padd, ver_padd):
-
-
-        square_length = abs(ceil((surface.get_height()-ver_padd*2)/max(self.width,self.height)))
+        square_length = abs(floor((surface.get_height()-ver_padd*2)/self.height))
 
         #```Resize the Images to the appropriate size for the size of the screen```
         #All these images are different resolutions so we need to figure out the
@@ -290,7 +389,6 @@ class Generator():
         col_pixel = hori_padd
         for row in self.tiles_level:
             for tile in row :
-                print(tile)
                 if tile == '#':
                     surface.blit(game_stone,(col_pixel,row_pixel))
                 elif tile == '.':
@@ -298,9 +396,27 @@ class Generator():
                 elif tile == ' ':
                     surface.blit(game_lava,(col_pixel,row_pixel))
                 else:
-                    print("We fucked up")
+                    print("Something went wrong")
+                    exit(0)
                 col_pixel = col_pixel + square_length
             col_pixel = hori_padd
             row_pixel = row_pixel + square_length
 
         # Pick a god and pray
+        """ Then we gotta render the Minotaur, player, k """
+        if self.has_key:
+            down_stairs= pygame.image.load('resources/stairs.png')
+            down_stairs= pygame.transform.scale(down_stairs, (square_length, square_length))
+            surface.blit(down_stairs, (hori_padd + self.goal[1]*square_length, ver_padd + self.goal[0]*square_length))
+        else:
+            key= pygame.image.load('resources/key.png')
+            key= pygame.transform.scale(key, (square_length, square_length))
+            surface.blit(key, (hori_padd + self.key[1]*square_length, ver_padd + self.key[0]*square_length))
+            closed_door= pygame.image.load('resources/closed.png')
+            closed_door= pygame.transform.scale(closed_door, (square_length, square_length))
+            surface.blit(closed_door, (hori_padd + self.goal[1]*square_length, ver_padd + self.goal[0]*square_length))
+        game_enemy = pygame.image.load('resources/enemy.png')
+        game_enemy = pygame.transform.scale(game_enemy, (square_length, square_length))
+        for enemy in self.enemy_list:
+            surface.blit(game_enemy, (hori_padd + enemy.y*square_length, ver_padd + enemy.x*square_length))
+        self.player.render(surface,hori_padd,ver_padd,square_length)
