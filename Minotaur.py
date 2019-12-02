@@ -42,7 +42,6 @@ class Minotaur:
     def walk(self):
         if len(self.target_path)>0 and self.path_progress< len(self.target_path):
             (self.x,self.y) = self.target_path[self.path_progress]
-            print("new")
             print((self.x,self.y))
             self.path_progress += 1
 
@@ -61,7 +60,6 @@ class Minotaur:
             node = path[-1]
             visited = visited + [node]
             if node == goal:
-                print("we got it")
                 print(path)
                 self.target_path = path
                 return path
@@ -71,10 +69,10 @@ class Minotaur:
 
             sorted_adjacent = sorted(sorted_adjacent,key = lambda node: node[0])
 
-            for adjacent in sorted_adjacent:
-                if adjacent[1] not in visited:
+            for value ,adjacent in sorted_adjacent:
+                if adjacent not in visited:
                     new_path = list(path)
-                    new_path.append(adjacent[1])
+                    new_path.append(adjacent)
                     queue.append(new_path)
 
     def dfs(self, goal, graph):
@@ -86,7 +84,7 @@ class Minotaur:
         while not fringe.empty():
             depth, current_node, path, visited  = fringe.get()
             if(current_node== goal):
-                self.target_path = path + [current_node]    
+                self.target_path = path + [current_node]
             visited = visited + [current_node]
             child_nodes = graph[current_node]
             sorted_adjacent=[]

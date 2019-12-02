@@ -1,6 +1,5 @@
 from __future__ import print_function
 import PIL
-from resizeimage import resizeimage
 from math import ceil , floor
 import pygame
 import random
@@ -332,12 +331,10 @@ class Generator():
             return False
 
     def update_ai(self):
-        if(self.enemy_list):
-            for enemy in self.enemy_list:
-                enemy.bfs((self.player.x,self.player.y),self.get_graph())
-                enemy.walk_reset()
-        else:
-            print("There are no enemies generated yet.")
+        for enemy in self.enemy_list:
+            enemy.bfs((self.player.x,self.player.y),self.get_graph())
+            enemy.walk_reset()
+
 
     def ai_walk(self, walk_interval,update_interval):
         if(self.update_clock == -1):
@@ -346,11 +343,10 @@ class Generator():
         if update_interval < (dt.datetime.now() - self.update_clock).total_seconds():
             self.update_ai()
             self.update_clock = dt.datetime.now()
+
         if walk_interval < (dt.datetime.now() - self.walk_clock).total_seconds():
             for enemy in self.enemy_list:
                 enemy.walk()
-                if(enemy.path_progress >= len(enemy.target_path)):
-                    self.update_ai()
                 print("Walking")
             self.walk_clock = dt.datetime.now()
 

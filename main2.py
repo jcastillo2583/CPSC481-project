@@ -21,7 +21,7 @@ def main():
     gameLoop = True
 
     # MAN PROGRAM LOOP
-    dungeon = Dungeon.Generator(40, 40, 5, 5 ,15)
+    dungeon = Dungeon.Generator(30, 30, 5, 3 ,4,2 )
     dungeon.gen_level()
     dungeon.gen_tiles_level()
     dungeon.gen_enemies(1)
@@ -37,16 +37,16 @@ def main():
                 gameLoop = False
             if event.type == pygame.KEYDOWN:
                 dungeon.play_game()
-        dungeon.ai_walk(0.5,10)
+        dungeon.ai_walk(0.33,8)
         dungeon.render(screen,  0, 10)
         state = dungeon.check_state()
         if(state == "lose"):
             gameLoop = False
-            print("You completed "+ to_string(levels_completed)+ " levels!")
+            print("You completed Lost!")
         elif(state == "win"):
             play_again = input("On to the next level? Y/n:")
             if(play_again == "Y"):
-                dungeon = Dungeon.Generator(40, 40, 5, 3,4)
+                dungeon = Dungeon.Generator(30, 30, 5, 3,4, 2)
                 dungeon.gen_level()
                 dungeon.gen_tiles_level()
                 dungeon.gen_enemies(2)
