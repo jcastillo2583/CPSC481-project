@@ -17,6 +17,9 @@ Dungeon.py
 main2.py
        - This is the main driver for the program. The main GUI window is implemented here along with the game loop. A dungeon is first created before the program enters the game loop.
        
+maze.py
+       - This file generates the overall maze in the dungeon. This file also generates the cells and its surrounding walls within the maze. Each cell may be surrounded by north, east, south, or west walls. We utilized Christian Hill's 2017 depth-first algorithm to help us generate the maze. Essentially, the program starts at a specific coordinate and creates a random structure for the maze, finding cell neighbors and establishing where to knock down the wall to create a path.
+       
 Minotaur.py
        - This file generates the Minotaur character and its behavior. The functions included in the file are the critical algorithms and formulas that drive the Minotaur. Such algorithms and formulas include the distance formula, best first search, and depth first search algorithms. 
        
