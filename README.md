@@ -22,3 +22,6 @@ Minotaur.py
        
 Player.py
        - This file generates the player character. The function render() sets different images/views of the player for every direction it is facing. The function move() receives the user's desired direction and utilizes key listeners to move in the specified direction. Additionally, the player's position updates as the player selects the different directions.
+
+Resources
+       - The resources folder contains all .png files needed to render the program with its user and AI. Various .png files are used to represent each movement the user performs as well.
